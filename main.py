@@ -1,5 +1,5 @@
 def main():
-    print("Hello from gdpr!")
+    print()
 
 
 if __name__ == "__main__":
