@@ -7,7 +7,7 @@ import os
 
 # --- Configuration ---
 MODEL_ID = "IIC/MEL"
-DATA_FILE_PATH = "data/gdpr-export-spain.json" # Path to the original data
+DATA_FILE_PATH = "data/gdpr-export-spain.json" 
 EMBEDDINGS_FILE_PATH = "data/gdpr_embeddings.npz"
 DB_PATH = "data/gdpr_db"
 EMBEDDING_DIM = 1024
@@ -31,7 +31,7 @@ def get_query_embedding(text):
         embedding = outputs.last_hidden_state.mean(dim=1)
     return embedding.cpu().numpy().astype(np.float32)
 
-# NEW FUNCTION: Loads the original text into a dictionary for easy lookup.
+# Loads the original text into a dictionary for easy lookup.
 def load_documents_for_lookup(filepath):
     """Loads document texts into a dictionary with ID as the key."""
     doc_lookup = {}
@@ -40,12 +40,14 @@ def load_documents_for_lookup(filepath):
         for i, entry in enumerate(data):
             content = entry.get("content", {})
             text_data = content.get("text", {})
+            parties = content.get("parties", "")
             
             summary = text_data.get("summary", "")
             facts = text_data.get("facts", "")
             holding = text_data.get("holding", "")
+            commments = text_data.get("comments", "")
             
-            full_text = f"Summary: {summary}\nFacts: {facts}\nHolding: {holding}"
+            full_text = f"Parties:{parties}\nSummary: {summary}\nFacts: {facts}\nHolding: {holding}\nComments: {commments}"
             doc_id = content.get("case_nr_name", f"Unknown_ID_{i}")
             
             doc_lookup[doc_id] = full_text
@@ -54,7 +56,7 @@ def load_documents_for_lookup(filepath):
 def main():
     """Main function to load the database and perform searches."""
     
-    # MODIFIED: Load document text for lookup
+    # Load document text for lookup
     print(f"Loading original document text from '{DATA_FILE_PATH}'...")
     document_lookup = load_documents_for_lookup(DATA_FILE_PATH)
     print(f"Loaded text for {len(document_lookup)} documents.")
